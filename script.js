@@ -8,51 +8,51 @@ document.body.appendChild(renderer.domElement);
 // 2. Set up texture loader and load the texture
 const textureLoader = new THREE.TextureLoader();
 const texture = textureLoader.load('https://raw.githubusercontent.com/Leo00rou/MicroCatcher-LL/refs/heads/main/AgarCircleTexture.JPG');
-const bumpMap = textureLoader.load('https://raw.githubusercontent.com/Leo00rou/MicroCatcher-LL/refs/heads/main/AgarCircleTexture.JPG'); // Bump map for texture shading
 
-// 3. Create a BufferGeometry for the sphere and a material with bump mapping
-const geometry = new THREE.SphereBufferGeometry(5, 64, 64); // BufferGeometry version of the sphere
+// 3. Create a smooth sphere geometry (base)
+const geometry = new THREE.SphereGeometry(5, 64, 64);
 const material = new THREE.MeshPhongMaterial({
   map: texture, // Apply the texture
-  bumpMap: bumpMap, // Apply the bump map for texture shading
-  bumpScale: 0.2, // Control the strength of the bump effect
   wireframe: false, // To show the texture as a solid form
+  bumpScale: 0.2, // Control the strength of the bump effect
 });
+
+// Create a mesh with the smooth sphere geometry
 const sphere = new THREE.Mesh(geometry, material);
 scene.add(sphere);
 
-// 4. Set up basic lighting to see the texture and bump map effects
+// 4. Create a morphed sphere with a bumpy surface as a morph target
+const morphedGeometry = new THREE.SphereGeometry(5, 64, 64);
+
+// Apply the "bumpy" effect on the morphed geometry
+const positions = morphedGeometry.attributes.position.array;
+for (let i = 0; i < positions.length; i += 3) {
+  const x = positions[i];
+  const y = positions[i + 1];
+  const z = positions[i + 2];
+  
+  const distance = Math.sqrt(x * x + y * y + z * z); // Distance from the center
+
+  // Apply bump by modifying the positions based on distance from the center
+  positions[i] += Math.sin(distance * 2) * 0.5; // X-axis bump
+  positions[i + 1] += Math.sin(distance * 2) * 0.5; // Y-axis bump
+  positions[i + 2] += Math.cos(distance * 2) * 0.5; // Z-axis bump
+}
+
+morphedGeometry.attributes.position.needsUpdate = true;
+
+// 5. Set the morph targets for the sphere mesh
+sphere.geometry.morphAttributes.position = [morphedGeometry.attributes.position];
+
+// 6. Set up basic lighting to see the texture and bump map effects
 const light = new THREE.PointLight(0xffffff, 1, 100);
 light.position.set(10, 10, 10);
 scene.add(light);
 
-// 5. Position the camera
-camera.position.z = 10; // Move camera back to see the sphere
+// 7. Position the camera
+camera.position.z = 10;
 
-// 6. Modify geometry to apply an initial wavy surface effect
-function applyInitialDeformation() {
-  const positions = sphere.geometry.attributes.position.array; // Access the position array of BufferGeometry
-  const time = performance.now() * 0.001; // Time-based factor to animate the deformation
-  
-  // Iterate through each vertex and apply a wave effect
-  for (let i = 0; i < positions.length; i += 3) {
-    const x = positions[i];
-    const y = positions[i + 1];
-    const z = positions[i + 2];
-    
-    const distance = Math.sqrt(x * x + y * y + z * z); // Distance from the center for a more fluid effect
-    
-    // Apply a smooth sine-based deformation for the initial wavy look
-    positions[i] += Math.sin(distance + time) * 0.5; // X-axis deformation
-    positions[i + 1] += Math.sin(distance + time) * 0.5; // Y-axis deformation
-    positions[i + 2] += Math.cos(distance + time) * 0.5; // Z-axis deformation
-  }
-  
-  // Mark the geometry to update its position data
-  sphere.geometry.attributes.position.needsUpdate = true;
-}
-
-// 7. Set up mouse interaction for further deformation
+// 8. Set up mouse interaction to morph the sphere over time
 let mouseX = 0;
 let mouseY = 0;
 
@@ -61,39 +61,19 @@ document.addEventListener('mousemove', (event) => {
   mouseY = -(event.clientY / window.innerHeight) * 2 + 1; // Normalized mouse position (Y-axis)
 });
 
-// 8. Modify geometry dynamically based on mouse movement
-function applyMouseDeformation() {
-  const positions = sphere.geometry.attributes.position.array;
-  const time = performance.now() * 0.001;
-  
-  for (let i = 0; i < positions.length; i += 3) {
-    const x = positions[i];
-    const y = positions[i + 1];
-    const z = positions[i + 2];
-    
-    const distance = Math.sqrt(x * x + y * y + z * z);
-    
-    // Add mouse interaction to amplify the wave deformation based on mouse position
-    positions[i] += Math.sin(distance + time + mouseX * 5) * 0.2; // X-axis deformation
-    positions[i + 1] += Math.sin(distance + time + mouseY * 5) * 0.2; // Y-axis deformation
-    positions[i + 2] += Math.cos(distance + time + mouseX * mouseY) * 0.2; // Z-axis deformation
-  }
+// 9. Animate the scene with morphing effect
+let morphTargetInfluence = 0; // Control the morph target blending
 
-  // Mark the geometry to update its position data
-  sphere.geometry.attributes.position.needsUpdate = true;
-}
-
-// 9. Animate the scene
 function animate() {
   requestAnimationFrame(animate);
 
-  // Apply initial wavy deformation
-  applyInitialDeformation();
+  // Calculate morph target influence based on mouse position
+  morphTargetInfluence = Math.abs(mouseX); // Influence increases as you move the mouse on X-axis
 
-  // Apply mouse-based deformation (dynamic interaction)
-  applyMouseDeformation();
+  // Apply the morph target influence to the sphere mesh
+  sphere.morphTargetInfluences[0] = morphTargetInfluence;
 
-  // Rotate the sphere for some dynamic effect
+  // Rotate the sphere for dynamic effect
   sphere.rotation.x += 0.01;
   sphere.rotation.y += 0.01;
 
