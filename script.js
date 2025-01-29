@@ -13,7 +13,7 @@ scene.add(new THREE.AmbientLight(0x404040)); // Ambient light for softer illumin
 
 // 3. Load the texture (ensure the raw URL is correct)
 const textureLoader = new THREE.TextureLoader();
-const texture = textureLoader.load('https://raw.githubusercontent.com/Leo00rou/MicroCatcher-LL/main/AgarCircleTexture.JPG');
+const texture = textureLoader.load('https://raw.githubusercontent.com/Leo00rou/MicroCatcher-LL/db7235599e4aa2237bfba83d6a59173d569bc11c/AgarCircleTexture.JPG');
 
 // 4. Create a sphere geometry (this will represent the agar plastic sheet)
 const geometry = new THREE.SphereGeometry(5, 32, 32); // A sphere with radius 5
