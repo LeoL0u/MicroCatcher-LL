@@ -19,10 +19,7 @@ for (let i = 0; i < vertices.length; i += 3) {
     let y = vertices[i + 1];
     let z = vertices[i + 2];
 
-    // Apply a noise function for an organic feel
     let noise = (Math.sin(x * 3) + Math.cos(y * 3) + Math.sin(z * 3)) * 0.3;
-
-    // Push outward to create bumps
     vertices[i] += x * noise * 0.1;
     vertices[i + 1] += y * noise * 0.1;
     vertices[i + 2] += z * noise * 0.1;
@@ -31,9 +28,9 @@ geometry.attributes.position.needsUpdate = true;
 
 // 5. Create the material and mesh
 const material = new THREE.MeshStandardMaterial({
-    map: texture, // Apply the texture
-    bumpMap: texture, // Use bump mapping for more details
-    bumpScale: 0.3, // Increase bump intensity
+    map: texture,
+    bumpMap: texture,
+    bumpScale: 0.3,
     metalness: 0.2,
     roughness: 0.7
 });
@@ -41,7 +38,7 @@ const material = new THREE.MeshStandardMaterial({
 const sphere = new THREE.Mesh(geometry, material);
 scene.add(sphere);
 
-// 6. Add lighting to enhance visibility
+// 6. Add lighting
 const light = new THREE.PointLight(0xffffff, 1.5);
 light.position.set(10, 10, 10);
 scene.add(light);
@@ -52,18 +49,25 @@ scene.add(ambientLight);
 // 7. Position the camera
 camera.position.z = 10;
 
-// 8. Animation loop with slow rotation
+// 8. Animation loop with rotation
 function animate() {
     requestAnimationFrame(animate);
 
-    // Rotate sphere slowly
-    sphere.rotation.y += 0.002; // Slow rotation on Y-axis
-    sphere.rotation.x += 0.001; // Slight rotation on X-axis for organic motion
+    console.log("Animating..."); // Debugging
+
+    if (sphere) {
+        sphere.rotation.y += 0.002;
+        sphere.rotation.x += 0.001;
+        console.log("Rotating Sphere:", sphere.rotation);
+    } else {
+        console.error("Sphere is not defined!");
+    }
 
     renderer.render(scene, camera);
 }
 
 // 9. Start animation
+console.log("Starting animation...");
 animate();
 
 // 10. Handle window resizing
