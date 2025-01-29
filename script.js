@@ -6,8 +6,8 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// 2. Create an organic shape (not a circle, but more of a freeform shape)
-const geometry = new THREE.PlaneGeometry(5, 5, 64, 64); // A plane with segments for flexibility
+// 2. Create an organic custom shape (not a square, not a circle)
+const geometry = new THREE.PlaneGeometry(5, 5, 64, 64);  // A plane with segments for flexibility
 const material = new THREE.MeshBasicMaterial({
   color: 0xFFFFFF,  // White color
   transparent: true,
