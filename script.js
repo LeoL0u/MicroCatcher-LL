@@ -12,7 +12,7 @@ const material = new THREE.MeshBasicMaterial({
   color: 0xFFFFFF,  // Set the color to white or any desired color
   transparent: true, 
   opacity: 0.5,  // Adjust opacity to make it translucent
-  wireframe: true  // Optional: remove the wireframe
+  wireframe: false  // Optional: remove the wireframe
 });
 const agarSheet = new THREE.Mesh(geometry, material);
 scene.add(agarSheet);
