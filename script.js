@@ -7,7 +7,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // 2. Create a circular agar sheet
-const geometry = new THREE.CircleGeometry(2, 64); // The radius is 2, and 64 segments for smoothness
+const geometry = new THREE.CircleGeometry(5, 64); // The radius is 5, and 64 segments for smoothness
 const material = new THREE.MeshBasicMaterial({ 
   color: 0xFFFFFF,  // Set the color to white or any desired color
   transparent: true, 
@@ -16,6 +16,9 @@ const material = new THREE.MeshBasicMaterial({
 });
 const agarSheet = new THREE.Mesh(geometry, material);
 scene.add(agarSheet);
+
+const light = new THREE.AmbientLight(0x404040);  // Add ambient light to make it visible
+scene.add(light);
 
 // 3. Position the camera
 camera.position.set(0, 0, 10);  // Position the camera directly on the z-axis (further away)
