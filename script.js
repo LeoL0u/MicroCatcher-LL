@@ -29,7 +29,30 @@ scene.add(light);
 // 5. Position the camera
 camera.position.z = 10; // Move camera back to see the sphere
 
-// 6. Set up mouse interaction for deformation
+// 6. Modify geometry to apply an initial wavy surface effect
+function applyInitialDeformation() {
+  const positions = sphere.geometry.attributes.position.array; // Access the position array of BufferGeometry
+  const time = performance.now() * 0.001; // Time-based factor to animate the deformation
+  
+  // Iterate through each vertex and apply a wave effect
+  for (let i = 0; i < positions.length; i += 3) {
+    const x = positions[i];
+    const y = positions[i + 1];
+    const z = positions[i + 2];
+    
+    const distance = Math.sqrt(x * x + y * y + z * z); // Distance from the center for a more fluid effect
+    
+    // Apply a smooth sine-based deformation for the initial wavy look
+    positions[i] += Math.sin(distance + time) * 0.5; // X-axis deformation
+    positions[i + 1] += Math.sin(distance + time) * 0.5; // Y-axis deformation
+    positions[i + 2] += Math.cos(distance + time) * 0.5; // Z-axis deformation
+  }
+  
+  // Mark the geometry to update its position data
+  sphere.geometry.attributes.position.needsUpdate = true;
+}
+
+// 7. Set up mouse interaction for further deformation
 let mouseX = 0;
 let mouseY = 0;
 
@@ -38,22 +61,19 @@ document.addEventListener('mousemove', (event) => {
   mouseY = -(event.clientY / window.innerHeight) * 2 + 1; // Normalized mouse position (Y-axis)
 });
 
-// 7. Modify geometry using BufferGeometry with dynamic wave effect
-function applyDeformation() {
-  const positions = sphere.geometry.attributes.position.array; // Access the position array of BufferGeometry
-
-  const time = performance.now() * 0.001; // Time-based factor to animate the deformation
+// 8. Modify geometry dynamically based on mouse movement
+function applyMouseDeformation() {
+  const positions = sphere.geometry.attributes.position.array;
+  const time = performance.now() * 0.001;
   
   for (let i = 0; i < positions.length; i += 3) {
-    // Get the x, y, z coordinates of each vertex
     const x = positions[i];
     const y = positions[i + 1];
     const z = positions[i + 2];
     
-    // Calculate the distance from the center to apply a more fluid wave-like deformation
     const distance = Math.sqrt(x * x + y * y + z * z);
     
-    // Apply a sine wave function for a smooth, fluid effect
+    // Add mouse interaction to amplify the wave deformation based on mouse position
     positions[i] += Math.sin(distance + time + mouseX * 5) * 0.2; // X-axis deformation
     positions[i + 1] += Math.sin(distance + time + mouseY * 5) * 0.2; // Y-axis deformation
     positions[i + 2] += Math.cos(distance + time + mouseX * mouseY) * 0.2; // Z-axis deformation
@@ -63,12 +83,15 @@ function applyDeformation() {
   sphere.geometry.attributes.position.needsUpdate = true;
 }
 
-// 8. Animate the scene
+// 9. Animate the scene
 function animate() {
   requestAnimationFrame(animate);
 
-  // Apply deformation based on mouse movement
-  applyDeformation();
+  // Apply initial wavy deformation
+  applyInitialDeformation();
+
+  // Apply mouse-based deformation (dynamic interaction)
+  applyMouseDeformation();
 
   // Rotate the sphere for some dynamic effect
   sphere.rotation.x += 0.01;
@@ -78,10 +101,10 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-// 9. Start animation
+// 10. Start animation
 animate();
 
-// 10. Handle window resizing
+// 11. Handle window resizing
 window.addEventListener('resize', function() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
