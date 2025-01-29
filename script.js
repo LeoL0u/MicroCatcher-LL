@@ -1,77 +1,61 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js';
+// 1. Set up the scene, camera, and renderer
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-let scene, camera, renderer, plane, clock;
+// 2. Create an oval shape (ellipse) as the agar sheet
+const geometry = new THREE.PlaneGeometry(3, 2, 64); // 3 and 2 are the width and height, respectively
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true, transparent: true });
+const agarSheet = new THREE.Mesh(geometry, material);
+scene.add(agarSheet);
 
-function init() {
-    // Create Scene
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 0, 5);
+// 3. Position the camera
+camera.position.z = 5;
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+// 4. Set up Web Audio API for sound input
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const analyser = audioContext.createAnalyser();
+const microphone = navigator.mediaDevices.getUserMedia({ audio: true });
 
-    clock = new THREE.Clock();
+microphone.then(function(stream) {
+  const source = audioContext.createMediaStreamSource(stream);
+  source.connect(analyser);
+  analyser.fftSize = 256;  // Number of frequency bins for the analyser
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
 
-    // Plane Geometry (Agar Sheet)
-    let geometry = new THREE.PlaneGeometry(5, 3, 100, 100); // More subdivisions for smooth deformation
-    let material = new THREE.ShaderMaterial({
-        vertexShader: `
-            uniform float time;
-            varying vec2 vUv;
-
-            float random(vec2 st) {
-                return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
-            }
-
-            float noise(vec2 st) {
-                vec2 i = floor(st);
-                vec2 f = fract(st);
-                vec2 u = f * f * (3.0 - 2.0 * f);
-                return mix(mix(random(i + vec2(0.0, 0.0)), random(i + vec2(1.0, 0.0)), u.x),
-                           mix(random(i + vec2(0.0, 1.0)), random(i + vec2(1.0, 1.0)), u.x), u.y);
-            }
-
-            void main() {
-                vUv = uv;
-                vec3 pos = position;
-                float n = noise(uv * 3.0 + time * 0.2);
-                pos.z += sin(n * 10.0) * 0.2;
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-            }
-        `,
-        fragmentShader: `
-            varying vec2 vUv;
-
-            void main() {
-                vec3 color = mix(vec3(0.8, 0.3, 0.5), vec3(0.2, 0.8, 0.7), vUv.y);
-                gl_FragColor = vec4(color, 1.0);
-            }
-        `,
-        uniforms: {
-            time: { value: 0 }
-        },
-        wireframe: false
-    });
-
-    plane = new THREE.Mesh(geometry, material);
-    scene.add(plane);
-
-    window.addEventListener("resize", onWindowResize, false);
-    animate();
-}
-
-function animate() {
+  // 5. Animate the agar sheet based on sound input
+  function animate() {
     requestAnimationFrame(animate);
-    plane.material.uniforms.time.value = clock.getElapsedTime();
+
+    analyser.getByteFrequencyData(dataArray);
+
+    // Map the sound data to movement
+    const averageFrequency = dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
+    const movementFactor = averageFrequency / 256;  // Normalize the sound data
+
+    // Add organic movement to the agar sheet (rotate and move based on sound)
+    agarSheet.rotation.x += 0.01 * movementFactor;
+    agarSheet.rotation.y += 0.01 * movementFactor;
+
+    // Slight oscillation to simulate organic movement (slow and smooth)
+    agarSheet.position.x = Math.sin(Date.now() * 0.001) * movementFactor;
+    agarSheet.position.y = Math.cos(Date.now() * 0.001) * movementFactor;
+
+    // Render the scene
     renderer.render(scene, camera);
-}
+  }
 
-function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-}
+  animate();
+}).catch(function(error) {
+  console.log('Error accessing microphone:', error);
+});
 
-init();
+// 6. Handle window resizing
+window.addEventListener('resize', function() {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+});
