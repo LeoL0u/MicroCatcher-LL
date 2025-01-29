@@ -6,19 +6,19 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// 2. Create an organic "Agar sheet" (circle shape)
-const geometry = new THREE.CircleGeometry(5, 64);  // Radius of 5, 64 segments for smoothness
+// 2. Create an organic shape (not a circle, but more of a freeform shape)
+const geometry = new THREE.PlaneGeometry(5, 5, 64, 64); // A plane with segments for flexibility
 const material = new THREE.MeshBasicMaterial({
   color: 0xFFFFFF,  // White color
   transparent: true,
   opacity: 0.5,  // Semi-transparent
-  wireframe: false  // Without wireframe
+  wireframe: true  // Wireframe for visibility
 });
 const agarSheet = new THREE.Mesh(geometry, material);
 scene.add(agarSheet);
 
-// 3. Add lighting for visibility
-const light = new THREE.PointLight(0xffffff, 0.5, 100);  // Dim point light
+// 3. Add lighting to the scene
+const light = new THREE.PointLight(0xffffff, 0.5, 100);
 light.position.set(10, 10, 10);
 scene.add(light);
 
@@ -50,22 +50,23 @@ microphone.then(function(stream) {
     const averageFrequency = dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
     const soundFactor = averageFrequency / 255;  // Normalize the sound data (0-1 range)
 
-    // Distort the geometry to create an organic movement effect
+    // Distort the vertices of the shape to create an organic movement effect
     const vertices = agarSheet.geometry.attributes.position.array;
 
+    // Apply sine wave distortion to the vertices, using sound intensity (soundFactor) to influence the movement
     for (let i = 0; i < vertices.length; i += 3) {
       const x = vertices[i];
       const y = vertices[i + 1];
 
-      // Apply sine wave distortion to the vertices, using sound intensity (soundFactor) to influence the movement
-      vertices[i] += Math.sin(time * 0.01 + x * 2) * 0.1 * soundFactor; // Distort x coordinates based on sound
-      vertices[i + 1] += Math.cos(time * 0.01 + y * 2) * 0.1 * soundFactor; // Distort y coordinates based on sound
+      // Distort the vertices based on sound factor, and use sine/cosine for organic movement
+      vertices[i] += Math.sin(time * 0.01 + x * 2) * 0.1 * soundFactor; // Distort x coordinates
+      vertices[i + 1] += Math.cos(time * 0.01 + y * 2) * 0.1 * soundFactor; // Distort y coordinates
     }
 
     agarSheet.geometry.attributes.position.needsUpdate = true;  // Update the geometry
 
-    // Slight rotation to make the effect more fluid
-    agarSheet.rotation.z += 0.01;  // Slow rotation for fluid motion
+    // Rotate the shape slightly to make the animation more fluid
+    agarSheet.rotation.z += 0.01;
 
     time += 1;  // Increment time for smooth animation
 
