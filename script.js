@@ -52,25 +52,16 @@ scene.add(ambientLight);
 // 7. Position the camera
 camera.position.z = 10;
 
-// 8. Set up mouse interaction for deformation
-let mouseX = 0;
-let mouseY = 0;
-
-document.addEventListener('mousemove', (event) => {
-  mouseX = (event.clientX / window.innerWidth) * 2 - 1; // Normalized mouse position (X-axis)
-  mouseY = -(event.clientY / window.innerHeight) * 2 + 1; // Normalized mouse position (Y-axis)
-});
-
-// 9. Animation loop (removes unnecessary errors)
+// 8. Animation loop (removes unnecessary errors)
 function animate() {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
 }
 
-// 10. Start animation
+// 9. Start animation
 animate();
 
-// 11. Handle window resizing
+// 10. Handle window resizing
 window.addEventListener('resize', function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
