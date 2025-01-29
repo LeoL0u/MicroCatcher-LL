@@ -6,7 +6,7 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// 2. Create a circular agar sheet (organic shape)
+// 2. Create an organic "Agar sheet" (circle shape)
 const geometry = new THREE.CircleGeometry(5, 64);  // Radius of 5, 64 segments for smoothness
 const material = new THREE.MeshBasicMaterial({
   color: 0xFFFFFF,  // White color
@@ -26,15 +26,27 @@ scene.add(light);
 camera.position.set(0, 0, 10);  // Camera further away
 camera.lookAt(0, 0, 0);  // Ensure camera faces the center
 
-// 5. Set up animation (generative movement)
+// 5. Set up animation (organic shape movement)
 let time = 0;
 
 function animate() {
   requestAnimationFrame(animate);
 
-  // Use a sine wave for organic movement
-  agarSheet.position.x = Math.sin(time * 0.001) * 3;  // Movement in X direction
-  agarSheet.position.y = Math.cos(time * 0.001) * 3;  // Movement in Y direction
+  // Distort the geometry to create an organic movement effect
+  const vertices = agarSheet.geometry.attributes.position.array;
+
+  for (let i = 0; i < vertices.length; i += 3) {
+    const x = vertices[i];
+    const y = vertices[i + 1];
+    
+    // Apply sine wave distortion to the vertices to create fluid movement
+    vertices[i] += Math.sin(time * 0.002 + x * 2) * 0.1; // Distort x coordinates
+    vertices[i + 1] += Math.cos(time * 0.002 + y * 2) * 0.1; // Distort y coordinates
+  }
+
+  agarSheet.geometry.attributes.position.needsUpdate = true;  // Update the geometry
+
+  // Make the shape rotate a little for a more fluid look
   agarSheet.rotation.z += 0.01;  // Slow rotation for fluid movement
 
   time += 1;  // Increment time for smooth animation
