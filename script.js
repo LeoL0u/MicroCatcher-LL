@@ -6,10 +6,12 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // 2. Create an oval shape (ellipse) as the agar sheet
-const geometry = new THREE.PlaneGeometry(3, 2, 64); // 3 and 2 are the width and height, respectively
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true, transparent: true });
-const agarSheet = new THREE.Mesh(geometry, material);
-scene.add(agarSheet);
+const material = new THREE.MeshBasicMaterial({ 
+  color: 0xFFFFFF,  // Set the color to white or any desired color
+  transparent: true, 
+  opacity: 0.5,  // Adjust opacity to make it translucent
+  wireframe: true // Optional: remove the wireframe
+});
 
 // 3. Position the camera
 camera.position.z = 5;
