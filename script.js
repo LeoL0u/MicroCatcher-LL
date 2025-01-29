@@ -41,10 +41,11 @@ function animate() {
   
   // Apply a wave-like distortion to simulate the movement of the agar
   for (let i = 0; i < positions.length; i += 3) {
+    // Apply sine and cosine functions to simulate organic motion
     positions[i + 2] = Math.sin(positions[i] * 0.5 + Date.now() * 0.001) * 0.5 + Math.cos(positions[i + 1] * 0.5 + Date.now() * 0.001) * 0.5;
   }
 
-  // Update the geometry
+  // Mark the position attribute as needing an update after modifying it
   agarSheet.geometry.attributes.position.needsUpdate = true;
 
   // Render the scene
