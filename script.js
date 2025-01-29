@@ -79,11 +79,3 @@ window.addEventListener('resize', function () {
     camera.updateProjectionMatrix();
 });
 
-// 11. Mouse move interaction to adjust size
-window.addEventListener("mousemove", (event) => {
-    let mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-    let mouseY = (event.clientY / window.innerHeight) * 2 - 1;
-
-    let scaleFactor = 1 + mouseX * 0.2; // Scale factor based on mouse X position
-    sphere.scale.set(scaleFactor, scaleFactor, scaleFactor);
-});
