@@ -8,7 +8,15 @@ document.body.appendChild(renderer.domElement);
 
 // 2. Load the texture (agar bioplastic)
 const textureLoader = new THREE.TextureLoader();
-const agarTexture = textureLoader.load('https://github.com/Leo00rou/MicroCatcher-LL/main/DSC09421.JPG');  // Use raw URL of the image
+const agarTexture = textureLoader.load(
+  'https://github.com/Leo00rou/MicroCatcher-LL/raw/main/DSC09421.JPG',  // Use raw URL of the image
+  () => {
+    console.log('Texture loaded successfully');
+  },
+  (error) => {
+    console.error('Error loading texture', error);
+  }
+);
 
 // 3. Create the agar sheet geometry and apply the texture
 const geometry = new THREE.PlaneGeometry(5, 5, 32, 32); // A plane instead of a sphere for more control
