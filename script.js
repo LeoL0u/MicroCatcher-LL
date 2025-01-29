@@ -5,16 +5,22 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// 2. Create a sphere geometry (this will represent the agar plastic sheet)
+// 2. Load the texture
+const textureLoader = new THREE.TextureLoader();
+const texture = textureLoader.load('path_to_your_image/DSC09421.JPG'); // Change to the correct path of your image
+
+// 3. Create a sphere geometry (this will represent the agar plastic sheet)
 const geometry = new THREE.SphereGeometry(5, 32, 32); // A sphere with radius 5
-const material = new THREE.MeshBasicMaterial({ color: 0xAAAAAA, wireframe: true });
+
+// Apply the texture to the material
+const material = new THREE.MeshBasicMaterial({ map: texture });
 const sphere = new THREE.Mesh(geometry, material);
 scene.add(sphere);
 
-// 3. Position the camera
+// 4. Position the camera
 camera.position.z = 10; // Position the camera to look at the sphere
 
-// 4. Function to animate the sphere based on mouse movement
+// 5. Function to animate the sphere based on mouse movement
 function animate() {
     requestAnimationFrame(animate);
 
@@ -30,12 +36,12 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-// 5. Add event listener for mouse movement
+// 6. Add event listener for mouse movement
 window.addEventListener('mousemove', (event) => {
     animate();
 });
 
-// 6. Handle window resizing
+// 7. Handle window resizing
 window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
