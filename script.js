@@ -1,75 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Point Cloud Landscape</title>
-  <style>
-    body { margin: 0; overflow: hidden; }
-    canvas { display: block; }
-  </style>
-</head>
-<body>
+// 1. Set up the scene, camera, and renderer
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xeeeeee);  // Set a light gray background
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.130.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.130.0/examples/jsm/loaders/GLTFLoader.js"></script>
+// 2. Load the texture (agar bioplastic)
+const textureLoader = new THREE.TextureLoader();
+const agarTexture = textureLoader.load('https://github.com/Leo00rou/MicroCatcher-LL/raw/main/DSC09421.JPG');  // Use raw URL of the image
 
-<script>
-  // 1. Set up the scene, camera, and renderer
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x000000);  // Dark background
+// 3. Create the agar sheet geometry and apply the texture
+const geometry = new THREE.PlaneGeometry(5, 5, 32, 32); // A plane instead of a sphere for more control
+const material = new THREE.MeshBasicMaterial({
+  map: agarTexture,  // Apply the agar texture
+  transparent: true,
+  opacity: 0.8,  // Adjust the opacity if needed
+  side: THREE.DoubleSide  // Make sure both sides of the plane are visible
+});
+const agarSheet = new THREE.Mesh(geometry, material);
+scene.add(agarSheet);
 
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  const renderer = new THREE.WebGLRenderer();
+// 4. Position the camera
+camera.position.set(0, 0, 10);  // Position the camera on the z-axis
+camera.lookAt(0, 0, 0);         // Make sure the camera is facing the center
+
+// 5. Animate the agar sheet
+function animate() {
+  requestAnimationFrame(animate);
+
+  // Apply a wave-like distortion to simulate the movement of the agar
+  agarSheet.geometry.vertices.forEach(vertex => {
+    vertex.z = Math.sin(vertex.x * 0.5 + Date.now() * 0.001) * 0.5 + Math.cos(vertex.y * 0.5 + Date.now() * 0.001) * 0.5;
+  });
+
+  // Update the geometry
+  agarSheet.geometry.verticesNeedUpdate = true;
+
+  // Render the scene
+  renderer.render(scene, camera);
+}
+
+animate();
+
+// 6. Handle window resizing
+window.addEventListener('resize', function() {
   renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  // 2. Set up the lighting (simple ambient light)
-  const light = new THREE.AmbientLight(0x404040, 1);  // Ambient light
-  scene.add(light);
-
-  // 3. Load the 3D point cloud model (landscape)
-  const loader = new THREE.GLTFLoader();
-  loader.load('https://raw.githubusercontent.com/Leo00rou/MicroCatcher-LL/main/landscape.glb', (gltf) => {
-    const model = gltf.scene;
-
-    // Optionally, apply a point material to the model
-    model.traverse((child) => {
-      if (child.isMesh) {
-        child.material = new THREE.PointsMaterial({ 
-          color: 0x00ff00,  // Green color for the points
-          size: 0.05,  // Point size
-          opacity: 0.8,  // Transparency level
-          transparent: true
-        });
-      }
-    });
-
-    scene.add(model);
-
-    // 4. Rotate the model on the z-axis over time
-    function animate() {
-      requestAnimationFrame(animate);
-
-      model.rotation.z += 0.001;  // Slowly rotate on z-axis
-
-      // Render the scene from the camera's perspective
-      renderer.render(scene, camera);
-    }
-
-    animate();
-  });
-
-  // 5. Position the camera
-  camera.position.z = 5;
-
-  // 6. Handle window resizing
-  window.addEventListener('resize', () => {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-  });
-</script>
-
-</body>
-</html>
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+});
