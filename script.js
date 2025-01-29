@@ -26,40 +26,61 @@ scene.add(light);
 camera.position.set(0, 0, 10);  // Camera further away
 camera.lookAt(0, 0, 0);  // Ensure camera faces the center
 
-// 5. Set up animation (organic shape movement)
-let time = 0;
+// 5. Set up Web Audio API for sound input
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const analyser = audioContext.createAnalyser();
+const microphone = navigator.mediaDevices.getUserMedia({ audio: true });
 
-function animate() {
-  requestAnimationFrame(animate);
+microphone.then(function(stream) {
+  const source = audioContext.createMediaStreamSource(stream);
+  source.connect(analyser);
+  analyser.fftSize = 256;  // Number of frequency bins for the analyser
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
 
-  // Distort the geometry to create an organic movement effect
-  const vertices = agarSheet.geometry.attributes.position.array;
+  // 6. Set up animation with sound reactivity
+  let time = 0;
 
-  for (let i = 0; i < vertices.length; i += 3) {
-    const x = vertices[i];
-    const y = vertices[i + 1];
-    
-    // Apply sine wave distortion to the vertices to create fluid movement
-    // Distort both x and y coordinates over time for organic change
-    vertices[i] += Math.sin(time * 0.01 + x * 2) * 0.1; // Distort x coordinates more dramatically
-    vertices[i + 1] += Math.cos(time * 0.01 + y * 2) * 0.1; // Distort y coordinates more dramatically
+  function animate() {
+    requestAnimationFrame(animate);
+
+    analyser.getByteFrequencyData(dataArray);  // Get frequency data from the microphone
+
+    // Calculate the average frequency intensity
+    const averageFrequency = dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
+    const soundFactor = averageFrequency / 255;  // Normalize the sound data (0-1 range)
+
+    // Distort the geometry to create an organic movement effect
+    const vertices = agarSheet.geometry.attributes.position.array;
+
+    for (let i = 0; i < vertices.length; i += 3) {
+      const x = vertices[i];
+      const y = vertices[i + 1];
+
+      // Apply sine wave distortion to the vertices, using sound intensity (soundFactor) to influence the movement
+      vertices[i] += Math.sin(time * 0.01 + x * 2) * 0.1 * soundFactor; // Distort x coordinates based on sound
+      vertices[i + 1] += Math.cos(time * 0.01 + y * 2) * 0.1 * soundFactor; // Distort y coordinates based on sound
+    }
+
+    agarSheet.geometry.attributes.position.needsUpdate = true;  // Update the geometry
+
+    // Slight rotation to make the effect more fluid
+    agarSheet.rotation.z += 0.01;  // Slow rotation for fluid motion
+
+    time += 1;  // Increment time for smooth animation
+
+    // Render the scene
+    renderer.render(scene, camera);
   }
 
-  agarSheet.geometry.attributes.position.needsUpdate = true;  // Update the geometry
+  // Start the animation
+  animate();
 
-  // Make the shape rotate a little for a more fluid look
-  agarSheet.rotation.z += 0.01;  // Slow rotation for fluid movement
+}).catch(function(error) {
+  console.log('Error accessing microphone:', error);
+});
 
-  time += 1;  // Increment time for smooth animation
-
-  // Render the scene
-  renderer.render(scene, camera);
-}
-
-// Start the animation
-animate();
-
-// 6. Handle window resizing
+// 7. Handle window resizing
 window.addEventListener('resize', function() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
