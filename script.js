@@ -8,17 +8,26 @@ document.body.appendChild(renderer.domElement);
 
 // 2. Create the 3D object (a sphere for now)
 const geometry = new THREE.SphereGeometry(5, 32, 32);  // Sphere with 32 segments
-const material = new THREE.MeshBasicMaterial({
+const material = new THREE.MeshStandardMaterial({
   color: 0xcccccc,  // Gray color for the material
-  wireframe: true    // Wireframe view to show structure (can be turned off for solid view)
+  roughness: 0.5,   // Add some roughness to the material to make it look more realistic
+  metalness: 0.5    // Slight metallic effect
 });
 const sphere = new THREE.Mesh(geometry, material);
 scene.add(sphere);
 
-// 3. Position the camera
-camera.position.z = 15;
+// 3. Add a light source (since MeshStandardMaterial needs light to be visible)
+const light = new THREE.AmbientLight(0x404040); // Ambient light
+scene.add(light);
 
-// 4. Mouse movement handling
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Directional light
+directionalLight.position.set(10, 10, 10);
+scene.add(directionalLight);
+
+// 4. Position the camera
+camera.position.z = 15;  // Move the camera back so we can see the sphere
+
+// 5. Mouse movement handling
 let mouseX = 0;
 let mouseY = 0;
 let lastMouseX = 0;
@@ -29,7 +38,7 @@ window.addEventListener('mousemove', (event) => {
   mouseY = (event.clientY / window.innerHeight) * 2 - 1;  // Normalized between -1 and 1
 });
 
-// 5. Animate the sphere (based on mouse movement)
+// 6. Animate the sphere (based on mouse movement)
 function animate() {
   requestAnimationFrame(animate);
 
@@ -58,7 +67,7 @@ function animate() {
 // Start the animation loop
 animate();
 
-// 6. Handle window resizing
+// 7. Handle window resizing
 window.addEventListener('resize', function() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
