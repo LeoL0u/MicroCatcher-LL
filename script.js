@@ -52,9 +52,14 @@ scene.add(ambientLight);
 // 7. Position the camera
 camera.position.z = 10;
 
-// 8. Animation loop (removes unnecessary errors)
+// 8. Animation loop with slow rotation
 function animate() {
     requestAnimationFrame(animate);
+
+    // Rotate sphere slowly
+    sphere.rotation.y += 0.002; // Slow rotation on Y-axis
+    sphere.rotation.x += 0.001; // Slight rotation on X-axis for organic motion
+
     renderer.render(scene, camera);
 }
 
