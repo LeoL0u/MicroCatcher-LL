@@ -18,7 +18,8 @@ const agarSheet = new THREE.Mesh(geometry, material);
 scene.add(agarSheet);
 
 // 3. Position the camera
-camera.position.z = 10;  // Move the camera farther away
+camera.position.set(0, 0, 10);  // Position the camera directly on the z-axis (further away)
+camera.lookAt(0, 0, 0);         // Make sure the camera is facing the center
 
 // 4. Set up Web Audio API for sound input
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
