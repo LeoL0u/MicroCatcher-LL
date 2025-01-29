@@ -11,9 +11,34 @@ const texture = textureLoader.load('https://raw.githubusercontent.com/Leo00rou/M
 
 // 3. Create a base sphere geometry
 const geometry = new THREE.SphereGeometry(5, 64, 64);
+const material = new THREE.MeshStandardMaterial({
+    map: texture,
+    bumpMap: texture,
+    bumpScale: 0.3,
+    metalness: 0.2,
+    roughness: 0.7
+});
+
+const sphere = new THREE.Mesh(geometry, material);
+scene.add(sphere);
+
+// 4. Add lighting
+const light = new THREE.PointLight(0xffffff, 1.5);
+light.position.set(10, 10, 10);
+scene.add(light);
+
+const ambientLight = new THREE.AmbientLight(0x404040, 1);
+scene.add(ambientLight);
+
+// 5. Position the camera
+camera.position.z = 10;
+
+// 6. Variables for rotation & bump intensity
+let rotationSpeed = 0.002; // Slow automatic rotation
+let bumpIntensity = 0.3;
 const vertices = geometry.attributes.position.array;
 
-// 4. Function to update vertex positions for bump effect
+// 7. Function to update vertex positions for bump effect
 function applyBumpEffect(intensity) {
     for (let i = 0; i < vertices.length; i += 3) {
         let x = vertices[i];
@@ -29,57 +54,31 @@ function applyBumpEffect(intensity) {
     geometry.attributes.position.needsUpdate = true;
 }
 
-// 5. Apply initial bumpiness
-applyBumpEffect(0.3);
+// 8. Apply initial bump effect
+applyBumpEffect(bumpIntensity);
 
-// 6. Create the material and mesh
-const material = new THREE.MeshStandardMaterial({
-    map: texture,
-    bumpMap: texture,
-    bumpScale: 0.3,
-    metalness: 0.2,
-    roughness: 0.5
-});
-
-const sphere = new THREE.Mesh(geometry, material);
-scene.add(sphere);
-
-// 7. Add lighting
-const light = new THREE.PointLight(0xffffff, 1.5);
-light.position.set(10, 10, 10);
-scene.add(light);
-
-const ambientLight = new THREE.AmbientLight(0x404040, 1);
-scene.add(ambientLight);
-
-// 8. Position the camera
-camera.position.z = 10;
-
-// 9. Variables for rotation & bump effect intensity
-let rotationSpeed = 0.001; // Slow rotation speed
-let bumpIntensity = 0.3;
-
-// 10. Animation loop
+// 9. Animation loop
 function animate() {
     requestAnimationFrame(animate);
 
-    // Apply slow automatic rotation
+    // Rotate the sphere
     sphere.rotation.y += rotationSpeed;
+    sphere.rotation.x += rotationSpeed * 0.5; // Add slight X rotation for organic movement
 
     renderer.render(scene, camera);
 }
 
-// 11. Start animation
+// 10. Start animation
 animate();
 
-// 12. Mouse move interaction to control bumpiness
+// 11. Mouse move interaction to control bumpiness
 window.addEventListener("mousemove", (event) => {
     let mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-    bumpIntensity = 0.3 + mouseX * 0.5; // Adjust bump intensity
+    bumpIntensity = 0.3 + mouseX * 0.5; // Adjust bump intensity dynamically
     applyBumpEffect(bumpIntensity);
 });
 
-// 13. Handle window resizing
+// 12. Handle window resizing
 window.addEventListener("resize", function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
