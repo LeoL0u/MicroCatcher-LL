@@ -8,20 +8,28 @@ document.body.appendChild(renderer.domElement);
 // 2. Set up texture loader and load the texture
 const textureLoader = new THREE.TextureLoader();
 const texture = textureLoader.load('https://raw.githubusercontent.com/Leo00rou/MicroCatcher-LL/refs/heads/main/AgarCircleTexture.JPG');
+const bumpMap = textureLoader.load('https://raw.githubusercontent.com/Leo00rou/MicroCatcher-LL/refs/heads/main/AgarCircleTexture.JPG'); // Bump map for texture shading
 
-// 3. Create a sphere geometry and material
-const geometry = new THREE.SphereGeometry(5, 64, 64); // Sphere with segments
-const material = new THREE.MeshBasicMaterial({
-  map: texture,
-  wireframe: false // Turn off wireframe for solid texture appearance
+// 3. Create a BufferGeometry for the sphere and a material with bump mapping
+const geometry = new THREE.SphereBufferGeometry(5, 64, 64); // BufferGeometry version of the sphere
+const material = new THREE.MeshPhongMaterial({
+  map: texture, // Apply the texture
+  bumpMap: bumpMap, // Apply the bump map for texture shading
+  bumpScale: 0.2, // Control the strength of the bump effect
+  wireframe: false, // To show the texture as a solid form
 });
 const sphere = new THREE.Mesh(geometry, material);
 scene.add(sphere);
 
-// 4. Position the camera
+// 4. Set up basic lighting to see the texture and bump map effects
+const light = new THREE.PointLight(0xffffff, 1, 100);
+light.position.set(10, 10, 10);
+scene.add(light);
+
+// 5. Position the camera
 camera.position.z = 10; // Move camera back to see the sphere
 
-// 5. Set up mouse interaction for deformation
+// 6. Set up mouse interaction for deformation
 let mouseX = 0;
 let mouseY = 0;
 
@@ -30,16 +38,37 @@ document.addEventListener('mousemove', (event) => {
   mouseY = -(event.clientY / window.innerHeight) * 2 + 1; // Normalized mouse position (Y-axis)
 });
 
-// 6. Animate the scene
+// 7. Modify geometry using BufferGeometry
+function applyDeformation() {
+  const positions = sphere.geometry.attributes.position.array; // Access the position array of BufferGeometry
+  
+  for (let i = 0; i < positions.length; i += 3) {
+    // Get the x, y, z coordinates of each vertex
+    const x = positions[i];
+    const y = positions[i + 1];
+    const z = positions[i + 2];
+    
+    // Calculate the distance from the center to apply some kind of deformation
+    const distance = Math.sqrt(x * x + y * y + z * z);
+
+    // Apply sine wave-based deformation based on distance and mouse position
+    positions[i] += Math.sin(distance + mouseX * 2) * 0.1;
+    positions[i + 1] += Math.sin(distance + mouseY * 2) * 0.1;
+    positions[i + 2] += Math.cos(distance + mouseX * mouseY) * 0.1;
+  }
+
+  // Mark the geometry to update its position data
+  sphere.geometry.attributes.position.needsUpdate = true;
+}
+
+// 8. Animate the scene
 function animate() {
   requestAnimationFrame(animate);
 
-  // Deform the sphere based on mouse position
-  sphere.scale.x = 1 + mouseX * 0.5;  // Stretch or compress in X axis
-  sphere.scale.y = 1 + mouseY * 0.5;  // Stretch or compress in Y axis
-  sphere.scale.z = 1 + (mouseX + mouseY) * 0.25; // Slight Z-axis deformation
+  // Apply deformation based on mouse movement
+  applyDeformation();
 
-  // Rotate the sphere slightly to give some dynamic effect
+  // Rotate the sphere for some dynamic effect
   sphere.rotation.x += 0.01;
   sphere.rotation.y += 0.01;
 
@@ -47,10 +76,10 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-// 7. Start animation
+// 9. Start animation
 animate();
 
-// 8. Handle window resizing
+// 10. Handle window resizing
 window.addEventListener('resize', function() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
