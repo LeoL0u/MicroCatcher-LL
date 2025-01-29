@@ -5,11 +5,17 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// 2. Load the new texture from the provided HTTP link
-const textureLoader = new THREE.TextureLoader();
-const texture = textureLoader.load('https://github.com/Leo00rou/MicroCatcher-LL/blob/main/AgarCircleTexture.JPG?raw=true'); // New image URL
+// 2. Add a light source to illuminate the sphere
+const light = new THREE.PointLight(0xFFFFFF, 1, 100);
+light.position.set(10, 10, 10);
+scene.add(light);
+scene.add(new THREE.AmbientLight(0x404040)); // Ambient light for softer illumination
 
-// 3. Create a sphere geometry (this will represent the agar plastic sheet)
+// 3. Load the texture (ensure the raw URL is correct)
+const textureLoader = new THREE.TextureLoader();
+const texture = textureLoader.load('https://raw.githubusercontent.com/Leo00rou/MicroCatcher-LL/main/AgarCircleTexture.JPG');
+
+// 4. Create a sphere geometry (this will represent the agar plastic sheet)
 const geometry = new THREE.SphereGeometry(5, 32, 32); // A sphere with radius 5
 
 // Apply the texture to the material (using MeshStandardMaterial for realistic shading)
@@ -17,10 +23,10 @@ const material = new THREE.MeshStandardMaterial({ map: texture, roughness: 0.7, 
 const sphere = new THREE.Mesh(geometry, material);
 scene.add(sphere);
 
-// 4. Position the camera
+// 5. Position the camera
 camera.position.z = 10; // Position the camera to look at the sphere
 
-// 5. Function to animate the sphere based on mouse movement
+// 6. Function to animate the sphere based on mouse movement
 function animate(event) {
     requestAnimationFrame(animate);
 
@@ -49,12 +55,12 @@ function animate(event) {
     renderer.render(scene, camera);
 }
 
-// 6. Add event listener for mouse movement
+// 7. Add event listener for mouse movement
 window.addEventListener('mousemove', (event) => {
     animate(event);
 });
 
-// 7. Handle window resizing
+// 8. Handle window resizing
 window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
