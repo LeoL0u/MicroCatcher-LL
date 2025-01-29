@@ -40,8 +40,9 @@ function animate() {
     const y = vertices[i + 1];
     
     // Apply sine wave distortion to the vertices to create fluid movement
-    vertices[i] += Math.sin(time * 0.002 + x * 2) * 0.1; // Distort x coordinates
-    vertices[i + 1] += Math.cos(time * 0.002 + y * 2) * 0.1; // Distort y coordinates
+    // Distort both x and y coordinates over time for organic change
+    vertices[i] += Math.sin(time * 0.01 + x * 2) * 0.1; // Distort x coordinates more dramatically
+    vertices[i + 1] += Math.cos(time * 0.01 + y * 2) * 0.1; // Distort y coordinates more dramatically
   }
 
   agarSheet.geometry.attributes.position.needsUpdate = true;  // Update the geometry
