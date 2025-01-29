@@ -34,7 +34,7 @@ const material = new THREE.MeshStandardMaterial({
     metalness: 0.1,
     roughness: 0.4,
     transparent: true,
-    opacity: 0.9  // Adjust transparency level
+    opacity: 0.5  // Adjust transparency level
 });
 
 const sphere = new THREE.Mesh(geometry, material);
