@@ -17,11 +17,6 @@ const material = new THREE.MeshBasicMaterial({
 const agarSheet = new THREE.Mesh(geometry, material);
 scene.add(agarSheet);
 
-// 3. Adjust lighting (remove ambient light or make it darker)
-const light = new THREE.PointLight(0xffffff, 0.5, 100);  // Dim point light for visibility
-light.position.set(10, 10, 10);
-scene.add(light);
-
 // 4. Position the camera
 camera.position.set(0, 0, 10);  // Position the camera farther away
 camera.lookAt(0, 0, 0);         // Make sure the camera is facing the center
