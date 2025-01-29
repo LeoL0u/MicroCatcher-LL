@@ -1,32 +1,36 @@
 // 1. Set up the scene, camera, and renderer
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x111111);  // Dark background
+scene.background = new THREE.Color(0x111111);  // Dark background for better visibility
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// 2. Create an organic custom shape (not a square, not a circle)
-const geometry = new THREE.PlaneGeometry(5, 5, 64, 64);  // A plane with segments for flexibility
-const material = new THREE.MeshBasicMaterial({
-  color: 0xFFFFFF,  // White color
+// 2. Create a 3D organic "fleshy" form (not a perfect sphere)
+const geometry = new THREE.SphereGeometry(5, 64, 64);  // Sphere geometry with enough segments for flexibility
+const material = new THREE.MeshPhongMaterial({
+  color: 0xF1C27D,  // Flesh-like color (light peach)
+  shininess: 10,  // Soft shiny effect for a fleshy look
+  emissive: 0x111111,  // Slight emissive glow for the "living" look
+  specular: 0x333333,
   transparent: true,
-  opacity: 0.5,  // Semi-transparent
-  wireframe: true  // Wireframe for visibility
+  opacity: 0.8
 });
 const agarSheet = new THREE.Mesh(geometry, material);
 scene.add(agarSheet);
 
-// 3. Add lighting to the scene
-const light = new THREE.PointLight(0xffffff, 0.5, 100);
-light.position.set(10, 10, 10);
-scene.add(light);
+// 3. Add lighting for the fleshy material to look realistic
+const ambientLight = new THREE.AmbientLight(0x555555);  // Soft ambient light
+scene.add(ambientLight);
+const pointLight = new THREE.PointLight(0xFFFFFF, 1, 100);  // Point light to illuminate the form
+pointLight.position.set(10, 10, 10);
+scene.add(pointLight);
 
-// 4. Position the camera to view the agar sheet
-camera.position.set(0, 0, 10);  // Camera further away
-camera.lookAt(0, 0, 0);  // Ensure camera faces the center
+// 4. Position the camera to view the "fleshy" form
+camera.position.set(0, 0, 10);  // Camera is far enough to view the form
+camera.lookAt(0, 0, 0);  // Make sure the camera is facing the center of the form
 
-// 5. Set up Web Audio API for sound input
+// 5. Set up Web Audio API for sound input (ambient soundscape)
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const analyser = audioContext.createAnalyser();
 const microphone = navigator.mediaDevices.getUserMedia({ audio: true });
@@ -38,7 +42,19 @@ microphone.then(function(stream) {
   const bufferLength = analyser.frequencyBinCount;
   const dataArray = new Uint8Array(bufferLength);
 
-  // 6. Set up animation with sound reactivity
+  // Create some ambient noise generator when the user enters the site
+  const buffer = audioContext.createBuffer(1, audioContext.sampleRate * 2, audioContext.sampleRate); // 2 seconds of sound
+  const noiseData = buffer.getChannelData(0);
+  for (let i = 0; i < noiseData.length; i++) {
+    noiseData[i] = Math.random() * 2 - 1; // White noise
+  }
+  const noiseSource = audioContext.createBufferSource();
+  noiseSource.buffer = buffer;
+  noiseSource.loop = true;
+  noiseSource.connect(audioContext.destination);
+  noiseSource.start();
+
+  // 6. Animate the organic shape based on sound input
   let time = 0;
 
   function animate() {
@@ -64,9 +80,6 @@ microphone.then(function(stream) {
     }
 
     agarSheet.geometry.attributes.position.needsUpdate = true;  // Update the geometry
-
-    // Rotate the shape slightly to make the animation more fluid
-    agarSheet.rotation.z += 0.01;
 
     time += 1;  // Increment time for smooth animation
 
