@@ -37,13 +37,15 @@ camera.lookAt(0, 0, 0);         // Make sure the camera is facing the center
 function animate() {
   requestAnimationFrame(animate);
 
+  const positions = agarSheet.geometry.attributes.position.array;
+  
   // Apply a wave-like distortion to simulate the movement of the agar
-  agarSheet.geometry.vertices.forEach(vertex => {
-    vertex.z = Math.sin(vertex.x * 0.5 + Date.now() * 0.001) * 0.5 + Math.cos(vertex.y * 0.5 + Date.now() * 0.001) * 0.5;
-  });
+  for (let i = 0; i < positions.length; i += 3) {
+    positions[i + 2] = Math.sin(positions[i] * 0.5 + Date.now() * 0.001) * 0.5 + Math.cos(positions[i + 1] * 0.5 + Date.now() * 0.001) * 0.5;
+  }
 
   // Update the geometry
-  agarSheet.geometry.verticesNeedUpdate = true;
+  agarSheet.geometry.attributes.position.needsUpdate = true;
 
   // Render the scene
   renderer.render(scene, camera);
