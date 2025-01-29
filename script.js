@@ -1,75 +1,43 @@
 // 1. Set up the scene, camera, and renderer
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xeeeeee);  // Light gray background
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// 2. Create the 3D object (a sphere for now)
-const geometry = new THREE.SphereGeometry(5, 32, 32);  // Sphere with 32 segments
-const material = new THREE.MeshStandardMaterial({
-  color: 0xcccccc,  // Gray color for the material
-  roughness: 0.5,   // Add some roughness to the material to make it look more realistic
-  metalness: 0.5    // Slight metallic effect
-});
+// 2. Create a sphere geometry (this will represent the agar plastic sheet)
+const geometry = new THREE.SphereGeometry(5, 32, 32); // A sphere with radius 5
+const material = new THREE.MeshBasicMaterial({ color: 0xAAAAAA, wireframe: true });
 const sphere = new THREE.Mesh(geometry, material);
 scene.add(sphere);
 
-// 3. Add a light source (since MeshStandardMaterial needs light to be visible)
-const light = new THREE.AmbientLight(0x404040); // Ambient light
-scene.add(light);
+// 3. Position the camera
+camera.position.z = 10; // Position the camera to look at the sphere
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Directional light
-directionalLight.position.set(10, 10, 10);
-scene.add(directionalLight);
-
-// 4. Position the camera
-camera.position.z = 15;  // Move the camera back so we can see the sphere
-
-// 5. Mouse movement handling
-let mouseX = 0;
-let mouseY = 0;
-let lastMouseX = 0;
-
-// Update mouse position when the user moves the mouse
-window.addEventListener('mousemove', (event) => {
-  mouseX = (event.clientX / window.innerWidth) * 2 - 1;  // Normalized between -1 and 1
-  mouseY = (event.clientY / window.innerHeight) * 2 - 1;  // Normalized between -1 and 1
-});
-
-// 6. Animate the sphere (based on mouse movement)
+// 4. Function to animate the sphere based on mouse movement
 function animate() {
-  requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
 
-  // Get the vertices from the sphere geometry
-  const positions = sphere.geometry.attributes.position.array;
+    // Deform the sphere based on mouse movement
+    const mouseX = (event.clientX / window.innerWidth) * 2 - 1; // Get mouse position in normalized space (-1 to 1)
+    const mouseY = -(event.clientY / window.innerHeight) * 2 + 1; // Get mouse position in normalized space (-1 to 1)
 
-  // Calculate how much the sphere should deform based on mouse position
-  const deformationFactor = mouseX * 2;  // This will control the amount of deformation
+    // Map mouse position to deformation
+    sphere.scale.x = 1 + mouseX * 0.5;
+    sphere.scale.y = 1 + mouseY * 0.5;
 
-  // Deform the sphere based on mouseX
-  for (let i = 0; i < positions.length; i += 3) {
-    const dist = Math.sqrt(positions[i] * positions[i] + positions[i + 1] * positions[i + 1] + positions[i + 2] * positions[i + 2]);
-    const scaleFactor = 1 + Math.sin(dist * 2 + Date.now() * 0.001) * 0.2;  // Make it more organic
-    positions[i] *= scaleFactor * deformationFactor;  // Adjust x-coordinate
-    positions[i + 1] *= scaleFactor * deformationFactor;  // Adjust y-coordinate
-    positions[i + 2] *= scaleFactor * deformationFactor;  // Adjust z-coordinate
-  }
-
-  // Mark the position attribute as needing an update
-  sphere.geometry.attributes.position.needsUpdate = true;
-
-  // Render the scene
-  renderer.render(scene, camera);
+    // Render the scene
+    renderer.render(scene, camera);
 }
 
-// Start the animation loop
-animate();
+// 5. Add event listener for mouse movement
+window.addEventListener('mousemove', (event) => {
+    animate();
+});
 
-// 7. Handle window resizing
-window.addEventListener('resize', function() {
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
+// 6. Handle window resizing
+window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
 });
