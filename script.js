@@ -32,7 +32,9 @@ const material = new THREE.MeshStandardMaterial({
     bumpMap: texture,
     bumpScale: 0.3,
     metalness: 0.1,
-    roughness: 0.3
+    roughness: 0.3,
+    transparent: true,
+    opacity = 0.8;  // Adjust transparency level
 });
 
 const sphere = new THREE.Mesh(geometry, material);
@@ -75,4 +77,13 @@ window.addEventListener('resize', function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+});
+
+// 11. Mouse move interaction to adjust size
+window.addEventListener("mousemove", (event) => {
+    let mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+    let mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+
+    let scaleFactor = 1 + mouseX * 0.2; // Scale factor based on mouse X position
+    sphere.scale.set(scaleFactor, scaleFactor, scaleFactor);
 });
