@@ -1,57 +1,61 @@
 // 1. Set up the scene, camera, and renderer
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xeeeeee);  // Set a light gray background
+scene.background = new THREE.Color(0xeeeeee);  // Light gray background
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// 2. Load the texture (agar bioplastic)
-const textureLoader = new THREE.TextureLoader();
-const agarTexture = textureLoader.load(
-  'https://github.com/Leo00rou/MicroCatcher-LL/raw/main/DSC09421.JPG',  // Use raw URL of the image
-  () => {
-    console.log('Texture loaded successfully');
-  },
-  (error) => {
-    console.error('Error loading texture', error);
-  }
-);
-
-// 3. Create the agar sheet geometry and apply the texture
-const geometry = new THREE.PlaneGeometry(5, 5, 32, 32); // A plane instead of a sphere for more control
+// 2. Create the 3D object (a sphere for now)
+const geometry = new THREE.SphereGeometry(5, 32, 32);  // Sphere with 32 segments
 const material = new THREE.MeshBasicMaterial({
-  map: agarTexture,  // Apply the agar texture
-  transparent: true,
-  opacity: 0.8,  // Adjust the opacity if needed
-  side: THREE.DoubleSide  // Make sure both sides of the plane are visible
+  color: 0xcccccc,  // Gray color for the material
+  wireframe: true    // Wireframe view to show structure (can be turned off for solid view)
 });
-const agarSheet = new THREE.Mesh(geometry, material);
-scene.add(agarSheet);
+const sphere = new THREE.Mesh(geometry, material);
+scene.add(sphere);
 
-// 4. Position the camera
-camera.position.set(0, 0, 10);  // Position the camera on the z-axis
-camera.lookAt(0, 0, 0);         // Make sure the camera is facing the center
+// 3. Position the camera
+camera.position.z = 15;
 
-// 5. Animate the agar sheet
+// 4. Mouse movement handling
+let mouseX = 0;
+let mouseY = 0;
+let lastMouseX = 0;
+
+// Update mouse position when the user moves the mouse
+window.addEventListener('mousemove', (event) => {
+  mouseX = (event.clientX / window.innerWidth) * 2 - 1;  // Normalized between -1 and 1
+  mouseY = (event.clientY / window.innerHeight) * 2 - 1;  // Normalized between -1 and 1
+});
+
+// 5. Animate the sphere (based on mouse movement)
 function animate() {
   requestAnimationFrame(animate);
 
-  const positions = agarSheet.geometry.attributes.position.array;
-  
-  // Apply a wave-like distortion to simulate the movement of the agar
+  // Get the vertices from the sphere geometry
+  const positions = sphere.geometry.attributes.position.array;
+
+  // Calculate how much the sphere should deform based on mouse position
+  const deformationFactor = mouseX * 2;  // This will control the amount of deformation
+
+  // Deform the sphere based on mouseX
   for (let i = 0; i < positions.length; i += 3) {
-    // Apply sine and cosine functions to simulate organic motion
-    positions[i + 2] = Math.sin(positions[i] * 0.5 + Date.now() * 0.001) * 0.5 + Math.cos(positions[i + 1] * 0.5 + Date.now() * 0.001) * 0.5;
+    const dist = Math.sqrt(positions[i] * positions[i] + positions[i + 1] * positions[i + 1] + positions[i + 2] * positions[i + 2]);
+    const scaleFactor = 1 + Math.sin(dist * 2 + Date.now() * 0.001) * 0.2;  // Make it more organic
+    positions[i] *= scaleFactor * deformationFactor;  // Adjust x-coordinate
+    positions[i + 1] *= scaleFactor * deformationFactor;  // Adjust y-coordinate
+    positions[i + 2] *= scaleFactor * deformationFactor;  // Adjust z-coordinate
   }
 
-  // Mark the position attribute as needing an update after modifying it
-  agarSheet.geometry.attributes.position.needsUpdate = true;
+  // Mark the position attribute as needing an update
+  sphere.geometry.attributes.position.needsUpdate = true;
 
   // Render the scene
   renderer.render(scene, camera);
 }
 
+// Start the animation loop
 animate();
 
 // 6. Handle window resizing
