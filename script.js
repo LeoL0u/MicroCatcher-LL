@@ -32,9 +32,9 @@ const material = new THREE.MeshStandardMaterial({
     bumpMap: texture,
     bumpScale: 0.3,
     metalness: 0.1,
-    roughness: 0.3,
+    roughness: 0.4,
     transparent: true,
-    opacity: 0.8  // Adjust transparency level
+    opacity: 0.9  // Adjust transparency level
 });
 
 const sphere = new THREE.Mesh(geometry, material);
@@ -71,6 +71,36 @@ function animate() {
 // 9. Start animation
 console.log("Starting animation...");
 animate();
+
+// 9. Add mouse move interaction for deformation
+let mouseX = 0;
+let mouseY = 0;
+window.addEventListener("mousemove", (event) => {
+    mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+    mouseY = -(event.clientY / window.innerHeight) * 2 + 1; // Inverted for better effect
+
+    // Apply deformation to the sphere based on mouse position
+    deformSphere(mouseX, mouseY);
+});
+
+// 10. Function to deform the sphere based on mouse position
+function deformSphere(mouseX, mouseY) {
+    const vertices = geometry.attributes.position.array;
+    const intensity = 0.1; // Deformation intensity factor
+
+    for (let i = 0; i < vertices.length; i += 3) {
+        let x = vertices[i];
+        let y = vertices[i + 1];
+        let z = vertices[i + 2];
+
+        // Apply deformation based on mouse position
+        vertices[i] += x * mouseX * intensity;  // Deform along X-axis based on mouseX
+        vertices[i + 1] += y * mouseY * intensity;  // Deform along Y-axis based on mouseY
+    }
+
+    // Update geometry after modification
+    geometry.attributes.position.needsUpdate = true;
+}
 
 // 10. Handle window resizing
 window.addEventListener('resize', function () {
