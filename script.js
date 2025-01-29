@@ -5,9 +5,9 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// 2. Load the texture from HTTP link
+// 2. Load the new texture from the provided HTTP link
 const textureLoader = new THREE.TextureLoader();
-const texture = textureLoader.load('https://raw.githubusercontent.com/Leo00rou/MicroCatcher-LL/main/DSC09421.JPG'); // HTTP URL to the image
+const texture = textureLoader.load('https://github.com/Leo00rou/MicroCatcher-LL/blob/main/AgarCircleTexture.JPG?raw=true'); // New image URL
 
 // 3. Create a sphere geometry (this will represent the agar plastic sheet)
 const geometry = new THREE.SphereGeometry(5, 32, 32); // A sphere with radius 5
