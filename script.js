@@ -38,7 +38,7 @@ const material = new THREE.MeshStandardMaterial({
     bumpMap: texture,
     bumpScale: 0.3,
     metalness: 0.2,
-    roughness: 0.7
+    roughness: 0.5
 });
 
 const sphere = new THREE.Mesh(geometry, material);
