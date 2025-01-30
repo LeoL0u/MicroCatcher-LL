@@ -12,7 +12,7 @@ const textureLoader = new THREE.TextureLoader();
 const texture = textureLoader.load('https://raw.githubusercontent.com/Leo00rou/MicroCatcher-LL/refs/heads/main/AgarCircleTexture.JPG');
 
 // 3. Create a base sphere geometry
-const geometry = new THREE.SphereGeometry(5, 64, 64); // Higher detail sphere
+let geometry = new THREE.SphereGeometry(5, 64, 64); // Higher detail sphere
 
 // 4. Modify the vertices to create bumps
 const vertices = geometry.attributes.position.array;
@@ -52,29 +52,6 @@ scene.add(ambientLight);
 
 // 7. Position the camera
 camera.position.z = 10;
-
-// 8. Adjust sphere size based on container width (to avoid stretching)
-function adjustSphereSize() {
-    const containerWidth = container.clientWidth; // Get the container width
-    const sphereSize = containerWidth / 6;  // Adjust the size of the sphere as a fraction of the container width
-
-    // Dispose of old geometry and create a new one with the adjusted size
-    geometry.dispose();
-    geometry = new THREE.SphereGeometry(sphereSize, 64, 64);
-    sphere.geometry = geometry;  // Assign the updated geometry to the sphere
-
-    // Reapply bump and material properties
-    const material = new THREE.MeshStandardMaterial({
-        map: texture,
-        bumpMap: texture,
-        bumpScale: 0.3,
-        metalness: 0.1,
-        roughness: 0.4,
-        transparent: true,
-        opacity: 0.8
-    });
-    sphere.material = material;
-}
 
 // 8. Animation loop with rotation
 function animate() {
@@ -132,7 +109,7 @@ window.addEventListener("mousemove", (event) => {
     deformSphere(mouseX, mouseY);
 });
 
-// 10. Handle window resizing
+// 11. Handle window resizing
 window.addEventListener('resize', function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -140,10 +117,32 @@ window.addEventListener('resize', function () {
 
     // Adjust the sphere size proportionally based on the new window size
     adjustSphereSize();
-    
 });
 
-// Function to check if the screen is in portrait mode
+// Function to adjust the sphere size
+function adjustSphereSize() {
+    const containerWidth = container.clientWidth;  // Get the container width
+    const sphereSize = containerWidth / 6;  // Adjust the size of the sphere as a fraction of the container width
+
+    // Dispose of old geometry and create a new one with the adjusted size
+    geometry.dispose();
+    geometry = new THREE.SphereGeometry(sphereSize, 64, 64);
+    sphere.geometry = geometry;  // Assign the updated geometry to the sphere
+
+    // Reapply bump and material properties
+    const material = new THREE.MeshStandardMaterial({
+        map: texture,
+        bumpMap: texture,
+        bumpScale: 0.3,
+        metalness: 0.1,
+        roughness: 0.4,
+        transparent: true,
+        opacity: 0.8
+    });
+    sphere.material = material;
+}
+
+// 12. Function to check if the screen is in portrait mode
 function checkOrientation() {
     const rotationMessage = document.getElementById("rotation-message");
     console.log(window.innerHeight, window.innerWidth); // Debugging screen size
@@ -158,7 +157,11 @@ function checkOrientation() {
 }
 
 // Run the function when the page loads
-window.addEventListener("load", checkOrientation); // Force orientation check after page load
+window.addEventListener("load", function() {
+    adjustSphereSize();  // Adjust sphere size after everything is loaded
+    window.dispatchEvent(new Event('resize')); // Trigger resize event to adjust after load
+    checkOrientation();  // Check orientation when the page loads
+}); 
 
 // Run the function whenever the screen is resized (e.g., when rotated)
 window.addEventListener("resize", checkOrientation);
