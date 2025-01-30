@@ -53,6 +53,29 @@ scene.add(ambientLight);
 // 7. Position the camera
 camera.position.z = 10;
 
+// 8. Adjust sphere size based on container width (to avoid stretching)
+function adjustSphereSize() {
+    const containerWidth = container.clientWidth; // Get the container width
+    const sphereSize = containerWidth / 6;  // Adjust the size of the sphere as a fraction of the container width
+
+    // Dispose of old geometry and create a new one with the adjusted size
+    geometry.dispose();
+    geometry = new THREE.SphereGeometry(sphereSize, 64, 64);
+    sphere.geometry = geometry;  // Assign the updated geometry to the sphere
+
+    // Reapply bump and material properties
+    const material = new THREE.MeshStandardMaterial({
+        map: texture,
+        bumpMap: texture,
+        bumpScale: 0.3,
+        metalness: 0.1,
+        roughness: 0.4,
+        transparent: true,
+        opacity: 0.8
+    });
+    sphere.material = material;
+}
+
 // 8. Animation loop with rotation
 function animate() {
     requestAnimationFrame(animate);
@@ -114,6 +137,10 @@ window.addEventListener('resize', function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+
+    // Adjust the sphere size proportionally based on the new window size
+    adjustSphereSize();
+    
 });
 
 // Function to check if the screen is in portrait mode
