@@ -10,12 +10,12 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow-x: hidden;
+            overflow-x: hidden; /* Prevent horizontal scroll */
         }
 
         .page {
             width: 100%;
-            height: 100vh; /* Ensure the page takes up the full viewport height */
+            height: 100vh; /* Each page takes full viewport height */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -23,9 +23,9 @@
         }
 
         .page img {
-            width: 100%;  /* Make sure image width fills the page */
-            height: auto; /* Maintain the aspect ratio */
-            object-fit: cover; /* Ensure image doesn't stretch but fills the screen */
+            height: 100vh; /* Image will stretch to fill the vertical height */
+            width: auto; /* Maintain aspect ratio */
+            object-fit: contain; /* Ensures the entire image is visible without cutting off */
         }
 
         #page4 {
