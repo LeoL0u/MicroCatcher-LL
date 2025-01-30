@@ -9,14 +9,13 @@
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100%;
             overflow-x: hidden;
             background-color: white; /* Default background */
         }
 
         .page {
             width: 100%;
-            height: 100vh; /* Each image takes full screen height */
+            min-height: 100vh; /* Each image takes full screen height */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -24,15 +23,15 @@
         }
 
         .page img {
-            width: auto;
-            height: 100vh; /* Ensures image fills the height without distortion */
+            width: 100%;  /* Ensures the image fills the width */
+            height: auto; /* Keeps aspect ratio */
             display: block;
         }
 
         /* Page 4 - Image with Three.js Sphere */
         #page4 {
             width: 100%;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -41,8 +40,8 @@
 
         /* Background Image for Page 4 */
         #page4 img {
-            width: auto;
-            height: 100vh;
+            width: 100%; /* Fit width */
+            height: auto; /* Maintain aspect ratio */
             display: block;
             position: absolute;
             top: 0;
