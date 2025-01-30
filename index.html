@@ -64,9 +64,29 @@
             z-index: 1; /* Sphere stays on top */
             pointer-events: none; /* Allows scrolling without blocking interaction */
         }
+
+        /* Rotation Message */
+        #rotate-message {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+            z-index: 1000;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
+
+        <!-- Rotation Message (Appears Only on Mobile in Portrait Mode) -->
+    <div id="rotate-message">Please rotate your phone for the best experience.</div>
 
     <!-- Pages 1 to 3 as full-width images -->
     <div class="page"><img src="images/MicroCatcher - Concept_1.jpg" alt="Page 1"></div>
