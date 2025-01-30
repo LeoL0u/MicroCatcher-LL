@@ -119,6 +119,7 @@ window.addEventListener('resize', function () {
 // Function to check if the screen is in portrait mode
 function checkOrientation() {
     const rotationMessage = document.getElementById("rotation-message");
+    console.log(window.innerHeight, window.innerWidth); // Debugging screen size
 
     if (window.innerHeight > window.innerWidth) {
         // Show the message if in portrait mode
@@ -130,7 +131,7 @@ function checkOrientation() {
 }
 
 // Run the function when the page loads
-checkOrientation();
+window.addEventListener("load", checkOrientation); // Force orientation check after page load
 
 // Run the function whenever the screen is resized (e.g., when rotated)
 window.addEventListener("resize", checkOrientation);
