@@ -116,3 +116,21 @@ window.addEventListener('resize', function () {
     camera.updateProjectionMatrix();
 });
 
+// Function to check if the screen is in portrait mode
+function checkOrientation() {
+    const rotationMessage = document.getElementById("rotation-message");
+
+    if (window.innerHeight > window.innerWidth) {
+        // Show the message if in portrait mode
+        rotationMessage.style.display = "flex";
+    } else {
+        // Hide the message if in landscape mode
+        rotationMessage.style.display = "none";
+    }
+}
+
+// Run the function when the page loads
+checkOrientation();
+
+// Run the function whenever the screen is resized (e.g., when rotated)
+window.addEventListener("resize", checkOrientation);
