@@ -11,20 +11,23 @@
             width: 100%;
             height: 100%;
             overflow-x: hidden; /* Prevent horizontal scroll */
+            background-color: white; /* Set white background */
         }
 
         .page {
             width: 100%;
-            height: 100vh; /* Each page takes full viewport height */
+            height: 100vh; /* Full viewport height */
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
+            background-color: white; /* Ensure a white background for each page */
         }
 
         .page img {
-            height: 100%; /* Ensures image fits the height of the container */
-            width: auto; /* Maintains original aspect ratio */
+            height: 100%; /* Fit the image to the height of the viewport */
+            width: auto; /* Maintain original aspect ratio */
+            object-fit: contain; /* Ensure image is fully contained in the page */
         }
 
         #page4 {
