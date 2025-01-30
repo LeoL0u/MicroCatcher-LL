@@ -5,55 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MicroCatcher-Concept</title>
     <style>
-        body, html {
+        /* Reset all margins and paddings */
+        * {
             margin: 0;
             padding: 0;
-            width: 100%;
-            overflow-x: hidden;
-            background-color: white; /* Default background */
+            box-sizing: border-box;
         }
 
-        .page {
+        body, html {
             width: 100%;
+            overflow-x: hidden;
+            background-color: white;
+        }
+
+        /* Ensures images fit width but can exceed viewport height */
+        .page {
+            width: 100vw; /* Full viewport width */
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden; /* Prevents any unexpected overflow */
         }
 
         .page img {
-            width: 100%;  /* Ensures images always fill the width */
-            height: auto; /* Keeps aspect ratio */
+            width: 100vw;  /* Ensures images always fit the width */
+            height: auto; /* Allows height to adjust naturally */
             display: block;
         }
 
         /* Page 4 - Background Image + Sphere */
         #page4 {
-            width: 100%;
+            width: 100vw;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
+            overflow: hidden;
         }
 
         /* Background Image for Page 4 */
         #page4 img {
-            width: 100%; /* Fill width */
+            width: 100vw; /* Fit width */
             height: auto; /* Maintain aspect ratio */
             display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            margin: auto;
+            position: relative;
             z-index: 0; /* Behind the sphere */
         }
 
         /* Three.js Sphere Container */
         #three-container {
             position: absolute;
-            width: 50%; /* Sphere on the left half */
+            width: 50vw; /* Sphere on the left half */
             height: 100%;
             top: 0;
             left: 0;
@@ -67,12 +68,12 @@
 </head>
 <body>
 
-    <!-- Pages 1 to 3 as images -->
+    <!-- Pages 1 to 3 as full-width images -->
     <div class="page"><img src="images/MicroCatcher - Concept_1.jpg" alt="Page 1"></div>
     <div class="page"><img src="images/MicroCatcher - Concept_2.jpg" alt="Page 2"></div>
     <div class="page"><img src="images/MicroCatcher - Concept_3.jpg" alt="Page 3"></div>
 
-    <!-- Page 4 with Background Image and Sphere (on Left Half) -->
+    <!-- Page 4 with Background Image and Sphere -->
     <div id="page4">
         <img src="images/MicroCatcher - Concept_4.jpg" alt="Page 4">
         <div id="three-container"></div>
