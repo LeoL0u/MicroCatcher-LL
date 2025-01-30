@@ -11,7 +11,6 @@
             width: 100%;
             height: 100%;
             overflow-x: hidden;
-            background-color: #C6DEFF; /* Replace this with your page 4 color */
         }
 
         .page {
@@ -20,12 +19,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
         }
 
         .page img {
-            width: auto;
-            height: 100%; /* Adjust image height to take up full height */
-            display: block;
+            width: 100%;  /* Make sure image width fills the page */
+            height: auto; /* Maintain the aspect ratio */
+            object-fit: cover; /* Ensure image doesn't stretch but fills the screen */
         }
 
         #page4 {
@@ -34,7 +34,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #C6DEFF; /* Replace with your Page 4 background color */
             position: relative;
         }
 
@@ -54,7 +53,7 @@
     <div class="page"><img src="images/MicroCatcher - Concept_2.jpg" alt="Page 2"></div>
     <div class="page"><img src="images/MicroCatcher - Concept_3.jpg" alt="Page 3"></div>
 
-    <!-- Page 4 with background color and 3D Sphere -->
+    <!-- Page 4 with 3D Sphere -->
     <div id="page4">
         <div id="three-container"></div>
     </div>
