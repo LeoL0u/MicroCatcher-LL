@@ -105,7 +105,7 @@
     <!-- Link to script.js -->
     <script src="script.js"></script>
 
-    <!-- Webring Section -->
+<!-- Webring Section -->
 <div id="webring">
     <strong>Living Sculpture Webring</strong><br>
     Check out other pages randomly <a href="http://sculptures.live?random" target="_blank">here</a>.
@@ -115,13 +115,15 @@
 <style>
     #webring {
         position: fixed;
-        bottom: 10px;
-        right: 10px;
+        top: 10px; /* Position it at the top */
+        right: 10px; /* Position it to the right */
+        background-color: rgba(255, 255, 255, 0.3); /* White with 30% transparency */
         color: black; /* Black text */
         padding: 10px 15px;
         font-family: 'Courier New', monospace; /* Apply Courier New */
         font-size: 14px;
         text-align: center;
+        border-radius: 5px; /* Soft rounded corners */
         z-index: 1000;
     }
 
